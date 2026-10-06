@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL || "https://student-performance-prediction-ic0v.onrender.com";
 function PredictionHistory() {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,7 +12,7 @@ function PredictionHistory() {
   const fetchHistory = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://127.0.0.1:5000/predictions");
+      const response = await fetch(`${API_URL}/predictions`);
       const data = await response.json();
       setHistory(data);
     } catch (error) {

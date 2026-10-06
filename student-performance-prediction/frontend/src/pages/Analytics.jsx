@@ -14,6 +14,7 @@ import {
   Cell,
 } from "recharts";
 
+const API_URL = import.meta.env.VITE_API_URL || "https://student-performance-prediction-ic0v.onrender.com";
 function Analytics() {
   const [history, setHistory] = useState([]);
   const [analytics, setAnalytics] = useState({
@@ -29,7 +30,7 @@ function Analytics() {
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:5000/predictions");
+        const response = await fetch(`${API_URL}/predictions`);
         const data = await response.json();
 
         setHistory(data);

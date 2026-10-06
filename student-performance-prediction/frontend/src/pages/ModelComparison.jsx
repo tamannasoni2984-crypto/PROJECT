@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+const API_URL = import.meta.env.VITE_API_URL || "https://student-performance-prediction-ic0v.onrender.com";
 function ModelComparison() {
   const [modelComparison, setModelComparison] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,7 +18,7 @@ function ModelComparison() {
   useEffect(() => {
     const fetchModelComparison = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:5000/model-comparison");
+        const response = await fetch(`${API_URL}/predictions`);
         const data = await response.json();
 
         const formattedData = Object.entries(data).map(([model, values]) => ({

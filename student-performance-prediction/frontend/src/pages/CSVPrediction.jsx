@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL || "https://student-performance-prediction-ic0v.onrender.com";
 function CSVPrediction() {
   const [csvResults, setCsvResults] = useState([]);
   const [csvLoading, setCsvLoading] = useState(false);
@@ -19,7 +20,7 @@ function CSVPrediction() {
     setCsvLoading(true);
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/predict-csv", {
+      const response = await fetch(`${API_URL}/predictions`, {
         method: "POST",
         body: formData,
       });
