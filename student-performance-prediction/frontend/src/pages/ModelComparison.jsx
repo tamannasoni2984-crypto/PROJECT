@@ -18,7 +18,7 @@ function ModelComparison() {
   useEffect(() => {
     const fetchModelComparison = async () => {
       try {
-        const response = await fetch(`${API_URL}/predictions`);
+        const response = await fetch(`${API_URL}/model-comparison`);
         const data = await response.json();
 
         const formattedData = Object.entries(data).map(([model, values]) => ({

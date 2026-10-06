@@ -29,7 +29,7 @@ function Prediction() {
     setErrorMsg("");
 
     try {
-      const response = await fetch(`${API_URL}/predictions`, {
+      const response = await fetch(`${API_URL}/predict`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

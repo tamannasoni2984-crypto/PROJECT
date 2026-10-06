@@ -28,7 +28,7 @@ function PredictionHistory() {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://127.0.0.1:5000/predictions/${id}`, {
+      const response = await fetch(`${API_URL}/predictions/${id}`, {
         method: "DELETE",
       });
 

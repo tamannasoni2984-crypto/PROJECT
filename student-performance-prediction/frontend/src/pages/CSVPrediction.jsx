@@ -20,7 +20,7 @@ function CSVPrediction() {
     setCsvLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/predictions`, {
+      const response = await fetch(`${API_URL}/predict-csv`, {
         method: "POST",
         body: formData,
       });
