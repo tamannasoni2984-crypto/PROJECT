@@ -279,10 +279,23 @@ function Prediction() {
   const filteredDataset = dataset
     .filter((s) => {
       const matchesCategory = categoryFilter === "ALL" || s.category === categoryFilter;
-      const query = searchQuery.trim().toLowerCase();
+      const rawQuery = searchQuery.trim().toLowerCase();
+      if (!rawQuery) return matchesCategory;
+
+      const digitsOnly = rawQuery.replace(/\D/g, "");
       const studentNum = String(s.student || s.id);
-      const scoreStr = String(s.final_score || s.predicted_score);
-      const matchesSearch = query === "" || studentNum.includes(query) || scoreStr.includes(query);
+      const studentLabel = `student ${studentNum}`.toLowerCase();
+      const score = s.final_score !== undefined ? s.final_score : s.predicted_score;
+      const scoreStr = String(score);
+      const categoryStr = (s.category || "").toLowerCase();
+
+      const matchesSearch =
+        studentLabel.includes(rawQuery) ||
+        studentNum === rawQuery ||
+        (digitsOnly !== "" && (studentNum === digitsOnly || scoreStr.includes(digitsOnly))) ||
+        scoreStr.includes(rawQuery) ||
+        categoryStr.includes(rawQuery);
+
       return matchesCategory && matchesSearch;
     })
     .sort((a, b) => {
@@ -722,13 +735,26 @@ function Prediction() {
 
               {/* Search & Sort */}
               <div className="table-search-sort">
-                <input
-                  type="text"
-                  placeholder="Search student # or score..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="table-search-input"
-                />
+                <div className="search-input-wrapper">
+                  <span className="search-icon">🔍</span>
+                  <input
+                    type="text"
+                    placeholder="Search student (e.g. 'student 20', '96')..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="table-search-input"
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      className="search-clear-btn"
+                      onClick={() => setSearchQuery("")}
+                      title="Clear search"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
 
                 <select
                   value={sortBy}
@@ -762,7 +788,32 @@ function Prediction() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredDataset.map((s) => {
+                  {filteredDataset.length === 0 ? (
+                    <tr>
+                      <td colSpan={10} style={{ textAlign: "center", padding: "35px 20px" }}>
+                        <div className="no-search-results">
+                          <p style={{ color: "#f87171", fontSize: "15px", marginBottom: "8px" }}>
+                            🔍 No students found matching "<strong>{searchQuery}</strong>"
+                          </p>
+                          <p style={{ color: "#94a3b8", fontSize: "13px", marginBottom: "12px" }}>
+                            Try searching for a student number (e.g. <code>20</code> or <code>student 20</code>), a score, or reset filters.
+                          </p>
+                          <button
+                            type="button"
+                            className="secondary-btn"
+                            style={{ padding: "8px 16px", fontSize: "13px" }}
+                            onClick={() => {
+                              setSearchQuery("");
+                              setCategoryFilter("ALL");
+                            }}
+                          >
+                            Reset Search & Show All ({totalStudents})
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredDataset.map((s) => {
                     const score = s.final_score !== undefined ? s.final_score : s.predicted_score;
                     const isSelected = String(selectedStudentId) === String(s.student || s.id);
 
@@ -810,7 +861,7 @@ function Prediction() {
                         </td>
                       </tr>
                     );
-                  })}
+                  }))}
                 </tbody>
               </table>
             </div>
