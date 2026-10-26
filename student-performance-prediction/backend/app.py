@@ -181,7 +181,13 @@ def predict_csv():
             results.append({
                 "student": index + 1,
                 "predicted score": predicted_score,
-                "category": category
+                "category": category,
+                "study_hours": float(input_data.iloc[index]["study_hours"]),
+                "attendance": float(input_data.iloc[index]["attendance"]),
+                "previous_score": float(input_data.iloc[index]["previous_score"]),
+                "assignment_completed": float(input_data.iloc[index]["assignment_completed"]),
+                "sleep_hours": float(input_data.iloc[index]["sleep_hours"]),
+                "extracurricular": int(input_data.iloc[index]["extracurricular"])
             })
 
         return jsonify({
@@ -191,6 +197,62 @@ def predict_csv():
     
     except Exception as error:
 
+        return jsonify({
+            "error": str(error)
+        }), 500
+
+
+@app.route("/dataset-students", methods=["GET"])
+def dataset_students():
+    try:
+        csv_path = "dataset/student_data.csv"
+        data = pd.read_csv(csv_path)
+        data.columns = data.columns.str.strip().str.lower()
+
+        required_columns = [
+            "study_hours",
+            "attendance",
+            "previous_score",
+            "assignment_completed",
+            "sleep_hours",
+            "extracurricular"
+        ]
+
+        input_data = data[required_columns]
+        predictions = model.predict(input_data)
+
+        students = []
+        for index, row in data.iterrows():
+            pred = round(max(0, min(100, float(predictions[index]))), 2)
+            actual = round(float(row.get("final_score", pred)), 2)
+
+            if actual >= 80:
+                category = "Excellent"
+            elif actual >= 60:
+                category = "Good"
+            elif actual >= 40:
+                category = "Average"
+            else:
+                category = "Needs Improvement"
+
+            students.append({
+                "student": index + 1,
+                "study_hours": float(row["study_hours"]),
+                "attendance": float(row["attendance"]),
+                "previous_score": float(row["previous_score"]),
+                "assignment_completed": float(row["assignment_completed"]),
+                "sleep_hours": float(row["sleep_hours"]),
+                "extracurricular": int(row["extracurricular"]),
+                "final_score": actual,
+                "predicted_score": pred,
+                "category": category
+            })
+
+        return jsonify({
+            "total_students": len(students),
+            "students": students
+        })
+    except Exception as error:
         return jsonify({
             "error": str(error)
         }), 500
